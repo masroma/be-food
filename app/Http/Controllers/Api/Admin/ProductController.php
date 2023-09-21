@@ -55,9 +55,35 @@ class ProductController extends Controller
         $image = $request->file('image');
         $image->storeAs('public/products', $image->hashName());
 
+        if($request->file('image_1')){
+            $image1 = $request->file('image_1');
+            $image1->storeAs('public/products', $image1->hashName());
+        }
+
+        if($request->file('image_2')){
+            $image2 = $request->file('image_2');
+            $image2->storeAs('public/products', $image2->hashName());
+        }
+
+        if($request->file('image_3')){
+            $image3 = $request->file('image_3');
+            $image3->storeAs('public/products', $image3->hashName());
+        }
+
+        if($request->file('image_4')){
+            $image4 = $request->file('image_4');
+            $image4->storeAs('public/products', $image4->hashName());
+        }
+
+
+
         //create product
         $product = Product::create([
             'image'         => $image->hashName(),
+            'image_1'       => $image1->hashName() ?? NULL,
+            'image_2'       => $image2->hashName() ?? NULL,
+            'image_3'       => $image3->hashName() ?? NULL,
+            'image_4'       => $image4->hashName() ?? NULL,
             'title'         => $request->title,
             'slug'          => Str::slug($request->title, '-'),
             'category_id'   => $request->category_id,
@@ -120,34 +146,50 @@ class ProductController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
+
         //check image update
         if ($request->file('image')) {
-
-            //remove old image
             Storage::disk('local')->delete('public/products/'.basename($product->image));
-        
             //upload new image
             $image = $request->file('image');
             $image->storeAs('public/products', $image->hashName());
-
-            //update product with new image
-            $product->update([
-                'image'         => $image->hashName(),
-                'title'         => $request->title,
-                'slug'          => Str::slug($request->title, '-'),
-                'category_id'   => $request->category_id,
-                'user_id'       => auth()->guard('api_admin')->user()->id,
-                'description'   => $request->description,
-                'weight'        => $request->weight,
-                'price'         => $request->price,
-                'stock'         => $request->stock,
-                'discount'      => $request->discount
-            ]);
-
         }
 
-        //update product without image
+        if ($request->file('image_1')) {
+            Storage::disk('local')->delete('public/products/'.basename($product->image_1));
+            //upload new image
+            $image1 = $request->file('image_1');
+            $image1->storeAs('public/products', $image1->hashName());
+        }
+
+        if ($request->file('image_2')) {
+            Storage::disk('local')->delete('public/products/'.basename($product->image_2));
+            //upload new image
+            $image2 = $request->file('image_2');
+            $image2->storeAs('public/products', $image2->hashName());
+        }
+
+        if ($request->file('image_3')) {
+            Storage::disk('local')->delete('public/products/'.basename($product->image_3));
+            //upload new image
+            $image3 = $request->file('image_3');
+            $image3->storeAs('public/products', $image3->hashName());
+        }
+
+        if ($request->file('image_4')) {
+            Storage::disk('local')->delete('public/products/'.basename($product->image_4));
+            //upload new image
+            $image4 = $request->file('image_4');
+            $image4->storeAs('public/products', $image4->hashName());
+        }
+
+
         $product->update([
+            'image'         => $image->hashName() ?? $product->image,
+            'image_1'       => $image1->hashName() ?? $product->image_1,
+            'image_2'       => $image2->hashName() ?? $product->image_2,
+            'image_3'       => $image3->hashName() ?? $product->image_3,
+            'image_4'       => $image4->hashName() ?? $product->image_4,
             'title'         => $request->title,
             'slug'          => Str::slug($request->title, '-'),
             'category_id'   => $request->category_id,
@@ -158,6 +200,9 @@ class ProductController extends Controller
             'stock'         => $request->stock,
             'discount'      => $request->discount
         ]);
+
+       
+     
 
         if($product) {
             //return success with Api Resource
@@ -178,6 +223,10 @@ class ProductController extends Controller
     {
         //remove image
         Storage::disk('local')->delete('public/products/'.basename($product->image));
+        Storage::disk('local')->delete('public/products/'.basename($product->image_1));
+        Storage::disk('local')->delete('public/products/'.basename($product->image_2));
+        Storage::disk('local')->delete('public/products/'.basename($product->image_3));
+        Storage::disk('local')->delete('public/products/'.basename($product->image_4));
 
         if($product->delete()) {
             //return success with Api Resource
