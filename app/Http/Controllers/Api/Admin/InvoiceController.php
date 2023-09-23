@@ -15,9 +15,14 @@ class InvoiceController extends Controller
      */
     public function index()
     {
+        if(request()->jumlahperpage){
+            $perPage = request()->jumlahperpage;
+        }else{
+            $perPage =10;
+        }
         $invoices = Invoice::with('customer')->when(request()->q, function($invoices) {
             $invoices = $invoices->where('invoice', 'like', '%'. request()->q . '%');
-        })->latest()->paginate(5);
+        })->latest()->paginate($perPage);
 
         //return with Api Resource
         return new InvoiceResource(true, 'List Data Invoices', $invoices);

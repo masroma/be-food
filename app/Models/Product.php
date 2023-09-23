@@ -15,7 +15,7 @@ class Product extends Model
      * @var array
      */
     protected $fillable = [
-        'image', 'title', 'slug', 'category_id', 'user_id', 'description', 'weight', 'price', 'stock', 'discount'
+        'image', 'image_1','image_2','image_3','image_4', 'title', 'slug', 'category_id', 'user_id', 'description', 'weight', 'price', 'stock', 'discount'
     ];
 
     /**
@@ -44,10 +44,21 @@ class Product extends Model
      * @param  mixed $image
      * @return void
      */
-    public function getImageAttribute($image)
-    {
-        return asset('storage/products/' . $image);
-    }
+    // public function getImageAttribute($image)
+    // {
+    //     return asset('storage/products/' . $image);
+    // }
+
+     /**
+     * getImage1Attribute
+     *
+     * @param  mixed $image1
+     * @return voids
+     */
+    // public function getImage1Attribute($image1)
+    // {
+    //     return asset('storage/products/' . $image1);
+    // }
         
     /**
      * getReviewsAvgRatingAttribute
