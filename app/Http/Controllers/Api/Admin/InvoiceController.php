@@ -28,6 +28,23 @@ class InvoiceController extends Controller
         return new InvoiceResource(true, 'List Data Invoices', $invoices);
     }
 
+    public function getByCustomer($id)
+    {
+        if(request()->jumlahperpage){
+            $perPage = request()->jumlahperpage;
+        }else{
+            $perPage =10;
+        }
+        $invoices = Invoice::with('customer')->when(request()->q, function($invoices) {
+            $invoices = $invoices->where('invoice', 'like', '%'. request()->q . '%');
+        })
+        ->where('customer_id', $id)
+        ->latest()->paginate($perPage);
+
+        //return with Api Resource
+        return new InvoiceResource(true, 'List Data Invoices', $invoices);
+    }
+
     /**
      * Display the specified resource.
      *

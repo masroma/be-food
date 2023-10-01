@@ -15,9 +15,25 @@ class CustomerController extends Controller
      */
     public function index()
     {
-        $customers = Customer::when(request()->q, function($customers) {
-            $customers = $customers->where('name', 'like', '%'. request()->q . '%');
-         })->latest()->paginate(5);
+        if(request()->jumlahperpage){
+            $perPage = request()->jumlahperpage;
+        }else{
+            $perPage =10;
+        }
+        // $customers = Customer::with('invoice')->when(request()->q, function($customers) {
+        //     $customers = $customers->where('name', 'like', '%'. request()->q . '%');
+        //  })->latest()->paginate($perPage);
+
+        $customers = Customer::leftjoin('invoices','invoices.customer_id','=','customers.id')
+        ->when(request()->q, function ($customers) {
+            $customers = $customers->where('name', 'like', '%' . request()->q . '%');
+        })
+        ->select('customers.*')
+        ->selectRaw('COUNT(invoices.customer_id) as invoice_count')
+        ->selectRaw('SUM(invoices.grand_total) as grand_total_sum')
+        ->groupBy('customers.id')
+        ->latest()
+        ->paginate($perPage);
 
         //return with Api Resource
         return new CustomerResource(true, 'List Data Customer', $customers);

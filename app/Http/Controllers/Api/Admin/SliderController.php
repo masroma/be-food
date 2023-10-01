@@ -19,8 +19,13 @@ class SliderController extends Controller
     public function index()
     {
         //get sliders
-        $sliders = Slider::latest()->paginate(5);
-        
+        if(request()->jumlahperpage){
+            $perPage = request()->jumlahperpage;
+        }else{
+            $perPage =10;
+        }
+        $sliders = Slider::latest()->paginate($perPage);
+
         //return with Api Resource
         return new SliderResource(true, 'List Data Sliders', $sliders);
     }
@@ -48,7 +53,7 @@ class SliderController extends Controller
         //create slider
         $slider = Slider::create([
             'image'=> $image->hashName(),
-            'link' => $request->link,
+            'link' => $request->link ?? '#',
         ]);
 
         if($slider) {
