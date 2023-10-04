@@ -20,10 +20,15 @@ class ProductController extends Controller
     public function index()
     {
         //get products
-        $products = Product::with('category')->when(request()->q, function($products) {
-            $products = $products->where('title', 'like', '%'. request()->q . '%');
-        })->latest()->paginate(5);
-        
+        if(request()->jumlahperpage){
+            $perPage = request()->jumlahperpage;
+        }else{
+            $perPage =10;
+        }
+        $products = Product::with('category')->when(request()->pencarian, function($products) {
+            $products = $products->where('title', 'like', '%'. request()->pencarian . '%');
+        })->latest()->paginate($perPage);
+
         //return with Api Resource
         return new ProductResource(true, 'List Data Products', $products);
     }
@@ -36,7 +41,7 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-       
+
         $validator = Validator::make($request->all(), [
             'image'         => 'required|image|mimes:jpeg,jpg,png|max:2000',
             'title'         => 'required|unique:products',
@@ -119,9 +124,9 @@ class ProductController extends Controller
     {
         $product = Product::find($id);
         $image1Url = $product->image_1;
-        
-       
-        
+
+
+
         if($product) {
             //return success with Api Resource
             return new ProductResource(true, 'Detail Data Product!', $product);
@@ -140,7 +145,7 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product)
     {
-        
+
         $validator = Validator::make($request->all(), [
             'title'         => 'required|unique:products,title,'.$product->id,
             'category_id'   => 'required',
@@ -157,9 +162,9 @@ class ProductController extends Controller
 
 
 
-        
+
         //check image update
-       
+
         if ($request->file('image')) {
             Storage::disk('local')->delete('public/products/'.basename($product->image));
             //upload new image
@@ -168,8 +173,8 @@ class ProductController extends Controller
             $img = $image->hashName();
         }
 
-      
-       
+
+
         if ($request->file('image_1')) {
             Storage::disk('local')->delete('public/products/'.basename($product->image_1));
             //upload new image
@@ -178,7 +183,7 @@ class ProductController extends Controller
             $img1 = $image1->hashName();
         }
 
-       
+
         if ($request->file('image_2')) {
             Storage::disk('local')->delete('public/products/'.basename($product->image_2));
             //upload new image
@@ -186,7 +191,7 @@ class ProductController extends Controller
             $image2->storeAs('public/products', $image2->hashName());
             $img2 = $image2->hashName();
         }
-        
+
         if ($request->file('image_3')) {
             Storage::disk('local')->delete('public/products/'.basename($product->image_3));
             //upload new image
@@ -195,7 +200,7 @@ class ProductController extends Controller
             $img3 = $image3->hashName();
         }
 
-       
+
         if ($request->file('image_4')) {
             Storage::disk('local')->delete('public/products/'.basename($product->image_4));
             //upload new image
@@ -204,8 +209,8 @@ class ProductController extends Controller
             $img4 = $image4->hashName();
         }
 
-       
-     
+
+
         $productData = [
             'title'         => $request->title,
             'slug'          => Str::slug($request->title, '-'),
@@ -217,7 +222,7 @@ class ProductController extends Controller
             'stock'         => $request->stock,
             'discount'      => $request->discount
         ];
-        
+
         if ($request->file('image')) {
             $productData['image'] = $img;
         }
@@ -237,13 +242,13 @@ class ProductController extends Controller
         if ($request->file('image_4')) {
             $productData['image_4'] = $img4;
         }
-       
-        
+
+
         // Update data produk
         $product->update($productData);
 
-       
-     
+
+
 
         if($product) {
             //return success with Api Resource

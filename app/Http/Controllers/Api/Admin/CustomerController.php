@@ -25,8 +25,8 @@ class CustomerController extends Controller
         //  })->latest()->paginate($perPage);
 
         $customers = Customer::leftjoin('invoices','invoices.customer_id','=','customers.id')
-        ->when(request()->q, function ($customers) {
-            $customers = $customers->where('name', 'like', '%' . request()->q . '%');
+        ->when(request()->pencarian, function ($customers) {
+            $customers = $customers->where('name', 'like', '%' . request()->pencarian . '%');
         })
         ->select('customers.*')
         ->selectRaw('COUNT(invoices.customer_id) as invoice_count')

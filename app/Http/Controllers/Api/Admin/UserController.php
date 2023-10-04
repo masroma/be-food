@@ -18,10 +18,15 @@ class UserController extends Controller
     public function index()
     {
         //get users
-        $users = User::when(request()->q, function($users) {
-            $users = $users->where('name', 'like', '%'. request()->q . '%');
-        })->latest()->paginate(5);
-        
+        if(request()->jumlahperpage){
+            $perPage = request()->jumlahperpage;
+        }else{
+            $perPage =10;
+        }
+        $users = User::when(request()->pencarian, function($users) {
+            $users = $users->where('name', 'like', '%'. request()->pencarian . '%');
+        })->latest()->paginate($perPage);
+
         //return with Api Resource
         return new UserResource(true, 'List Data Users', $users);
     }
@@ -37,7 +42,7 @@ class UserController extends Controller
         $validator = Validator::make($request->all(), [
             'name'     => 'required',
             'email'    => 'required|unique:users',
-            'password' => 'required|confirmed' 
+            'password' => 'required|confirmed'
         ]);
 
         if ($validator->fails()) {
@@ -69,7 +74,7 @@ class UserController extends Controller
     public function show($id)
     {
         $user = User::whereId($id)->first();
-        
+
         if($user) {
             //return success with Api Resource
             return new UserResource(true, 'Detail Data User!', $user);

@@ -37,6 +37,9 @@ Route::prefix('admin')->group(function () {
         //customer
         Route::get('/customers', [App\Http\Controllers\Api\Admin\CustomerController::class, 'index', ['as' => 'admin']]);
 
+        Route::get('/settingapp', [App\Http\Controllers\Api\Admin\SettingAppController::class, 'index', ['as' => 'settingapp']]);
+
+        Route::patch('/settingapp/update/{id}', [App\Http\Controllers\Api\Admin\SettingAppController::class, 'update', ['as' => 'settingapp.update']]);
         //sliders resource
         Route::apiResource('/sliders', App\Http\Controllers\Api\Admin\SliderController::class, ['except' => ['create', 'show', 'edit', 'update'], 'as' => 'admin']);
 

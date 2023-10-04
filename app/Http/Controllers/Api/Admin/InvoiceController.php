@@ -20,8 +20,8 @@ class InvoiceController extends Controller
         }else{
             $perPage =10;
         }
-        $invoices = Invoice::with('customer')->when(request()->q, function($invoices) {
-            $invoices = $invoices->where('invoice', 'like', '%'. request()->q . '%');
+        $invoices = Invoice::with('customer')->when(request()->pencarian, function($invoices) {
+            $invoices = $invoices->where('invoice', 'like', '%'. request()->pencarian . '%');
         })->latest()->paginate($perPage);
 
         //return with Api Resource
@@ -54,7 +54,7 @@ class InvoiceController extends Controller
     public function show($id)
     {
         $invoice = Invoice::with('orders.product', 'customer', 'city', 'province')->whereId($id)->first();
-        
+
         if($invoice) {
             //return success with Api Resource
             return new InvoiceResource(true, 'Detail Data Invoice!', $invoice);
