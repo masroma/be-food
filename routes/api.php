@@ -91,6 +91,7 @@ Route::prefix('web')->group(function () {
 
     //products resource
     Route::apiResource('/products', App\Http\Controllers\Api\Web\ProductController::class, ['except' => ['create', 'store', 'edit', 'update', 'destroy'], 'as' => 'web']);
+    Route::get('/product-laris', [App\Http\Controllers\Api\Web\ProductController::class, 'productLaris'], ['as' => 'web']);
 
     //sliders route
     Route::get('/sliders', [App\Http\Controllers\Api\Web\SliderController::class, 'index'], ['as' => 'web']);
