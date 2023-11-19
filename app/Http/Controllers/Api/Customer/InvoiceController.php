@@ -32,7 +32,7 @@ class InvoiceController extends Controller
     public function show($snap_token)
     {
         $invoice = Invoice::with('orders.product', 'customer', 'city', 'province')->where('customer_id', auth()->guard('api_customer')->user()->id)->where('snap_token', $snap_token)->first();
-        
+
         if($invoice) {
             //return success with Api Resource
             return new InvoiceResource(true, 'Detail Data Invoice : '.$invoice->snap_token.'', $invoice);
