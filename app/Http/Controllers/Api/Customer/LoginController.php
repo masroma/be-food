@@ -6,9 +6,13 @@ use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
+use App\Models\Customer;
+use App\Http\Resources\CustomerResource;
+use Illuminate\Support\Facades\Hash;
+
 
 class LoginController extends Controller
-{    
+{
     /**
      * index
      *
@@ -22,7 +26,7 @@ class LoginController extends Controller
             'email'    => 'required|email',
             'password' => 'required',
         ]);
-        
+
         //response error validasi
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
@@ -41,12 +45,12 @@ class LoginController extends Controller
             ], 401);
 
         }
-        
+
         //response login "success" dengan generate "Token"
         return response()->json([
             'success' => true,
-            'user'    => auth()->guard('api_customer')->user(),  
-            'token'   => $token   
+            'user'    => auth()->guard('api_customer')->user(),
+            'token'   => $token
         ], 200);
     }
 
@@ -63,7 +67,7 @@ class LoginController extends Controller
             'user'    => auth()->guard('api_customer')->user()
         ], 200);
     }
-    
+
     /**
      * refreshToken
      *
@@ -85,10 +89,10 @@ class LoginController extends Controller
         return response()->json([
             'success' => true,
             'user'    => $user,
-            'token'   => $refreshToken,  
+            'token'   => $refreshToken,
         ], 200);
     }
-    
+
     /**
      * logout
      *
@@ -104,5 +108,54 @@ class LoginController extends Controller
             'success' => true,
         ], 200);
 
+    }
+
+    public function updateProfile(Request $request){
+
+        $auth = auth()->guard('api_customer')->user();
+        $validator = Validator::make($request->all(), [
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|unique:customers,email,'.$auth->id,
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
+
+        $update = Customer::find($auth->id);
+        $update->name = $request->name;
+        $update->email = $request->email;
+        $update->save();
+
+        if($update) {
+            //return with Api Resource
+            return new CustomerResource(true, 'update Customer Berhasil', $auth);
+        }
+
+        //return failed with Api Resource
+        return new CustomerResource(false, 'Register Customer Gagal!', null);
+    }
+
+    public function updatePassword(Request $request)
+    {
+        // Validasi request
+        $request->validate([
+            'oldpassword' => 'required',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $user = auth()->guard('api_customer')->user();
+
+        // Periksa apakah password lama sesuai
+        if (!Hash::check($request->oldpassword, $user->password)) {
+            return response()->json(['error' => 'Password lama tidak sesuai'], 422);
+        }
+
+        // Update password pengguna
+        $user->update([
+            'password' => Hash::make($request->password),
+        ]);
+
+        return new CustomerResource(true, 'password berhasil diubah', $user);
     }
 }

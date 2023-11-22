@@ -65,6 +65,10 @@ Route::prefix('customer')->group(function () {
         //data user
         Route::get('/user', [App\Http\Controllers\Api\Customer\LoginController::class, 'getUser'], ['as' => 'customer']);
 
+        Route::post('/updateprofile', [App\Http\Controllers\Api\Customer\LoginController::class, 'updateProfile'], ['as' => 'customer']);
+
+        Route::post('/updatepassword', [App\Http\Controllers\Api\Customer\LoginController::class, 'updatePassword'], ['as' => 'customer']);
+
         //refresh token JWT
         Route::get('/refresh', [App\Http\Controllers\Api\Customer\LoginController::class, 'refreshToken'], ['as' => 'customer']);
 
